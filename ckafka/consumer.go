@@ -11,7 +11,8 @@ import (
 )
 
 type msgConsumer interface {
-	HandleMessage(value []byte, key string, topic string, partition int32, offset int64) error
+	HandleMessage(message *kafka.Message) error
+	//HandleMessage(value []byte, key string, topic string, partition int32, offset int64) error
 }
 
 type ConsumerGroup struct {
@@ -85,7 +86,8 @@ func (cg *ConsumerGroup) loop(handler msgConsumer) {
 		}
 		switch e := ev.(type) {
 		case *kafka.Message:
-			err := handler.HandleMessage(e.Value, string(e.Key), *e.TopicPartition.Topic, e.TopicPartition.Partition, int64(e.TopicPartition.Offset))
+			err := handler.HandleMessage(e)
+			//err := handler.HandleMessage(e.Value, string(e.Key), *e.TopicPartition.Topic, e.TopicPartition.Partition, int64(e.TopicPartition.Offset))
 			if err != nil {
 				if _, err1 := cg.Consumer.StoreMessage(e); err1 != nil {
 					logx.Errorf("store message error: %s", err1.Error())
