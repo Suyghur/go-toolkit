@@ -14,7 +14,7 @@ import (
 )
 
 type ProducerConfig struct {
-	Addrs     []string `json:""`
+	Brokers   []string `json:""`
 	Topic     string   `json:""`
 	User      string   `json:",optional"`
 	Passwd    string   `json:",optional"`
@@ -23,7 +23,7 @@ type ProducerConfig struct {
 
 type Producer struct {
 	topic         string
-	addr          []string
+	brokers       []string
 	config        ProducerConfig
 	producer      *kafka.Producer
 	msgChan       chan kafka.Event
@@ -33,7 +33,7 @@ type Producer struct {
 
 func MustNewProducer(config ProducerConfig) *Producer {
 	configMap := &kafka.ConfigMap{
-		"bootstrap.servers": strings.Join(config.Addrs, ","),
+		"bootstrap.servers": strings.Join(config.Brokers, ","),
 	}
 	if config.User != "" {
 		_ = configMap.Set("sasl.mechanisms=PLAIN")
@@ -71,7 +71,7 @@ func MustNewProducer(config ProducerConfig) *Producer {
 	ch := make(chan kafka.Event)
 	return &Producer{
 		topic:         config.Topic,
-		addr:          config.Addrs,
+		brokers:       config.Brokers,
 		config:        config,
 		producer:      producer,
 		msgChan:       ch,

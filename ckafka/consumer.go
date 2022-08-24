@@ -22,7 +22,7 @@ type ConsumerGroup struct {
 }
 
 type ConsumerGroupConfig struct {
-	Addrs     []string
+	Brokers   []string
 	Topic     string
 	Group     string
 	Offset    string `json:",options=first|last,default=last"`
@@ -40,7 +40,7 @@ func (c ConsumerGroupConfig) GetOffset() kafka.ConfigValue {
 
 func GetConsumer(cfg ConsumerGroupConfig) *ConsumerGroup {
 	conf := &kafka.ConfigMap{
-		"bootstrap.servers":        strings.Join(cfg.Addrs, ","),
+		"bootstrap.servers":        strings.Join(cfg.Brokers, ","),
 		"auto.offset.reset":        cfg.GetOffset(),
 		"enable.auto.offset.store": false,
 		"enable.auto.commit":       true,
